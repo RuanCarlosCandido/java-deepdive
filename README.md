@@ -4,7 +4,7 @@
 ## 📚 Tópicos a serem abordados
 
 ### Java Moderno (Java 17–21)
-- Streams (básico e avançado, paralelos, custom collectors)
+- Streams (paralelos, custom collectors)
 - Optionals idiomáticos
 - Lambdas complexas + method references
 - Records, Sealed Classes
@@ -73,3 +73,14 @@ Ferramentas principais:
 - ChatGPT (OpenAI)
 - GitHub Copilot
 - Google Bard (suporte complementar)
+
+
+
+### ✅ Prompt reutilizável para gerar exercícios avançados em Java
+
+```
+ Crie uma suite de testes completa para resolver um problema complexo para praticar o uso de [INSERIR TEMA].
+ Premissas:
+    Problemas realistas ou inspirados em desafios de mercado, Nível avançado, como em entrevistas técnicas internacionais concorridas, Java 17 - 21,Junit 5 com o minimo de libs fora dessa, cobrindo casos típicos e de borda, A solução esperada deve exigir uso idiomático e profundo do tema
+
+```

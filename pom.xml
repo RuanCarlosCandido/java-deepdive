@@ -16,6 +16,8 @@
 
     <modules>
         <module>core-modern-java</module>
+        <module>leetcode-helper</module>
+
     </modules>
 
     <build>
