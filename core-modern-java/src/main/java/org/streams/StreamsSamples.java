@@ -1,6 +1,7 @@
 package org.streams;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,13 +17,15 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.streams.StreamsSamples.User;
+
 public interface StreamsSamples {
 
-    final User john = new User("john", 1, false, Genre.M, List.of("john@email.com"));
-    final User mary = new User("mary", 2, true, Genre.F, List.of("mary@email.com", "mary2@email.com"));
-    final User mane = new User("mane", 3, false, Genre.M,
+    final User john = new User("john", 1, false, Gender.M, List.of("john@email.com"));
+    final User mary = new User("mary", 2, true, Gender.F, List.of("mary@email.com", "mary2@email.com"));
+    final User mane = new User("mane", 3, false, Gender.M,
             List.of("mane@email.com", "mane2@email.com", "mane3@email.com"));
-    final User badUser = new User(null, 0, true, Genre.M, null);
+    final User badUser = new User(null, 0, true, Gender.M, null);
 
     public static void main(String[] args) {
         // iterateSample();
@@ -69,7 +72,7 @@ public interface StreamsSamples {
 
         // reduceSample();
 
-        //reduceSample2();
+        // reduceSample2();
 
         // anyMatchSample();
 
@@ -77,6 +80,60 @@ public interface StreamsSamples {
 
         // noneMatchSample();
 
+        // collectToSpecificCollectionSample();
+
+        // collectToMapSample2();
+
+        // collectPartitioningBySample();
+
+        //teeingSample();
+
+    }
+
+    /**
+     * Exemplo de uso do Collectors.teeing, ideal para executar duas operações de
+     * coleta em paralelo
+     * sobre o mesmo stream, com apenas uma iteração, combinando os resultados em um
+     * único objeto.
+     *
+     * Situação típica: quando se deseja calcular múltiplos agregados (ex: média e
+     * máximo)
+     * e retornar ambos em uma estrutura composta (ex: DTO de estatísticas).
+     */
+
+    private static void teeingSample() {
+        record Stats(double averageAge, String oldestUserName) {
+        }
+
+        Stats stats = Stream.of(john, mary, mane)
+                .collect(Collectors.teeing(
+                        Collectors.averagingInt(User::age), // coleta média
+                        Collectors.maxBy(Comparator.comparingInt(User::age)), // coleta usuário mais velho
+                        (avg, maxUserOpt) -> new Stats(avg, maxUserOpt.map(User::name).orElse("N/A"))));
+
+        System.out.println(stats);
+    }
+
+    private static void collectPartitioningBySample() {
+        Stream.of(john, mary, mane).collect(Collectors.partitioningBy(User::isActive))
+                .forEach((isActive, user) -> System.out
+                        .println(isActive + " -> " + user));
+    }
+
+    private static void collectToMapSample2() {
+        BiConsumer<? super String, ? super Gender> biConsumer = (name, gender) -> System.out
+                .println(name + " -> " + gender);
+        Function<? super User, ? extends String> function = User::name;
+        Function<? super User, ? extends Gender> function2 = User::gender;
+        Stream.of(john, mary, mane).collect(Collectors.toMap(function, function2))
+                .forEach(biConsumer);
+    }
+
+    private static void collectToSpecificCollectionSample() {
+        LinkedList<String> linkedList = Stream.of(john, mary, mane).map(User::name)
+                .collect(Collectors.toCollection(LinkedList::new));
+        linkedList
+                .forEach(System.out::println);
     }
 
     private static void noneMatchSample() {
@@ -97,9 +154,9 @@ public interface StreamsSamples {
     private static void reduceSample2() {
         BinaryOperator<String> binaryOperator = (a, b) -> a + ", " + b;
         System.out.println(Stream.of(john, mary, mane)
-        .map(User::name)
-        .reduce(binaryOperator)
-        .orElse("nenhum nome encontrado"));
+                .map(User::name)
+                .reduce(binaryOperator)
+                .orElse("nenhum nome encontrado"));
     }
 
     private static void reduceSample() {
@@ -138,10 +195,10 @@ public interface StreamsSamples {
 
     private static void groupingBySample() {
 
-        BiConsumer<? super Genre, ? super List<User>> biConsumer = (genre, user) -> System.out
+        BiConsumer<? super Gender, ? super List<User>> biConsumer = (genre, user) -> System.out
                 .println(genre + " -> " + user);
-        Function<? super User, ? extends Genre> function = User::genre;
-        Collector<User, ?, Map<Genre, List<User>>> groupingBy = Collectors.groupingBy(function);
+        Function<? super User, ? extends Gender> function = User::gender;
+        Collector<User, ?, Map<Gender, List<User>>> groupingBy = Collectors.groupingBy(function);
         Stream.of(john, mary, mane).collect(groupingBy).forEach(biConsumer);
     }
 
@@ -278,10 +335,10 @@ public interface StreamsSamples {
         squares.forEach(printActionConsumer); // 1, 2, 4 (stops when next 8 > 5)
     }
 
-    public record User(String name, int age, boolean isActive, Genre genre, List<String> emails) {
+    public record User(String name, int age, boolean isActive, Gender gender, List<String> emails) {
     }
 
-    public enum Genre {
+    public enum Gender {
         M, F
     }
 
