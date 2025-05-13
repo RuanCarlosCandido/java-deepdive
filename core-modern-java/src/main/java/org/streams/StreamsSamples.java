@@ -17,8 +17,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.streams.StreamsSamples.User;
-
+@SuppressWarnings("unused")
 public interface StreamsSamples {
 
     final User john = new User("john", 1, false, Gender.M, List.of("john@email.com"));
