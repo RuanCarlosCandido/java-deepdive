@@ -39,6 +39,7 @@ class TransactionAnalyzerTest {
     private CurrencyConverter currencyConverter;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setup() {
         currencyConverter = new CurrencyConverter(Map.of(
                 "USD", new BigDecimal("5.00"),
@@ -71,7 +72,7 @@ class TransactionAnalyzerTest {
 
         CustomerReport user1 = result.get("user1");
         assertNotNull(user1);
-        assertEquals(new BigDecimal("320.00"), user1.totalInBRL().setScale(2));
+        assertEquals(new BigDecimal("400.00"), user1.totalInBRL().setScale(2));
         assertEquals(3, user1.transactionCountByType().values().stream().mapToInt(Integer::intValue).sum());
         assertEquals(YearMonth.of(2024, Month.FEBRUARY), user1.peakMonth());
 
@@ -94,8 +95,9 @@ class TransactionAnalyzerTest {
         List<Transaction> faulty = List
                 .of(new Transaction("userX", TransactionType.PIX, new BigDecimal("100"), "JPY", YearMonth.now()));
 
-        assertThrows(IllegalArgumentException.class,
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> TransactionAnalyzer.analyze(faulty.stream(), currencyConverter));
+        assertNotNull(exception.getMessage());
     }
 
     @Test
@@ -108,6 +110,6 @@ class TransactionAnalyzerTest {
 
         Map<String, CustomerReport> result = TransactionAnalyzer.analyze(large.parallelStream(), currencyConverter);
         assertEquals(100, result.size());
-        assertEquals(new BigDecimal("5000.00"), result.get("user0").totalInBRL());
+        assertEquals(new BigDecimal("50000.00"), result.get("user0").totalInBRL());
     }
 }

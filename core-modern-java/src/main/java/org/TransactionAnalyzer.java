@@ -1,42 +1,94 @@
 package org;
 
+import java.math.BigDecimal;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TransactionAnalyzer {
 
-    public static Map<String, CustomerReport> analyze(Stream<Transaction> parallel,
+    public static Map<String, CustomerReport> analyze(Stream<Transaction> transactionsStream,
             CurrencyConverter currencyConverter) {
 
-        Map<String, CustomerReport> result = new HashMap<>();
+        return solucaoFuncional(transactionsStream, currencyConverter);
 
-        // Transaction firstTransaction = parallel.findFirst().orElse(null);
-
-        // Stream<Object> currenciesStream = parallel.map(inner -> inner.currency());
-
-        // List<String> currencies = parallel.map(inner ->
-        // inner.currency()).collect(getCollectorsToList());
-
-        Object a = parallel.map(inner -> inner.currency()).collect(getCollectorsGroupingBy());
-
-        System.out.println(a);
-
-        return result;
-
+        //return solucaoImperativa(transactionsStream, currencyConverter);
     }
 
-    private static Collector getCollectorsGroupingBy() {
-       return Collectors.groupingBy(Transaction::currency);
+    private static Map<String, CustomerReport> solucaoFuncional(Stream<Transaction> transactionsStream,
+            CurrencyConverter currencyConverter) {
+
+        transactionsStream
+        .filter(transaction -> currencyConverter.currencyMap().containsKey(transaction.currency()))
+        .peek(transaction -> System.out.println("[DEBUG] Processando transacao: " + transaction)).collect(Collectors.toList());
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'solucaoFuncional'");
     }
 
-    private static <T> Collector<T, ?, List<T>> getCollectorsToList() {
+    private static Map<String, CustomerReport> solucaoImperativa(Stream<Transaction> transactionsStream,
+            CurrencyConverter currencyConverter) {
+        List<Transaction> transactions = transactionsStream.collect(Collectors.toList());
 
-        return Collectors.toList();
+        Map<String, CustomerReport> userReports = new HashMap<>();
+
+        for (Transaction transaction : transactions) {
+
+            if(!currencyConverter.currencyMap().containsKey(transaction.currency())) throw new IllegalArgumentException("Currency not mapped");
+
+            BigDecimal amount = transaction.value().multiply(currencyConverter.currencyMap().get(transaction.currency()));
+
+            String userId = transaction.user();
+
+            if (userReports.containsKey(userId)) {
+                CustomerReport existingReport = userReports.get(userId);
+
+                Map<TransactionType, Integer> countsByType = existingReport.transactionCountByType();
+
+                Map<YearMonth, BigDecimal> monthlyHighestValue = existingReport.monthValue();
+                for (Entry<YearMonth, BigDecimal> entry : monthlyHighestValue.entrySet()) {
+                    if (entry.getValue().compareTo(transaction.value()) < 0) {
+                        Map<YearMonth, BigDecimal> updatedMonthlyValue = new HashMap<>();
+                        updatedMonthlyValue.put(transaction.yearMonth(), amount);
+                        monthlyHighestValue = updatedMonthlyValue;
+                    }
+                }
+
+                if (countsByType.containsKey(transaction.transactionType())) {
+                    int newCount = countsByType.get(transaction.transactionType()) + 1;
+                    countsByType.put(transaction.transactionType(), newCount);
+                } else {
+                    countsByType.put(transaction.transactionType(), 1);
+                }
+
+                BigDecimal existingTotalInBRL = existingReport.totalInBRL();
+                BigDecimal updatedTotalInBRL = existingTotalInBRL.add(amount);
+
+                CustomerReport updatedReport = new CustomerReport(
+                        updatedTotalInBRL,
+                        countsByType,
+                        monthlyHighestValue.keySet().stream().findFirst().orElse(null),
+                        monthlyHighestValue);
+                userReports.put(userId, updatedReport);
+
+            } else {
+                Map<TransactionType, Integer> countsByType = new HashMap<>();
+                countsByType.put(transaction.transactionType(), 1);
+
+                CustomerReport newReport = new CustomerReport(
+                        amount,
+                        countsByType,
+                        transaction.yearMonth(),
+                        Map.of(transaction.yearMonth(), transaction.value()));
+                userReports.put(userId, newReport);
+            }
+        }
+
+        System.out.println(userReports);
+        return userReports;
     }
-    // Collector<Employee, ?, Map<Department, Integer>> summingSalariesByDept
-    // = Collectors.groupingBy(Employee::getDepartment, summingSalaries);
+
 }

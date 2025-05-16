@@ -7,6 +7,7 @@ import java.util.Map;
 public record CustomerReport(
         BigDecimal totalInBRL,
         Map<TransactionType, Integer> transactionCountByType,
-        YearMonth peakMonth) {
+        YearMonth peakMonth,
+        Map<YearMonth, BigDecimal> monthValue) {
 
 }

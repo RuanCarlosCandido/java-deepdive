@@ -8,25 +8,30 @@ public interface App {
         String a = "1010";
         String b = "1011";
 
-        System.out.println(solution.addBinary(a, b));
+        //System.out.println(solution.addBinary(a, b));
+
+        System.out.println(solution.mySqrt(9));
+        System.out.println(solution.mySqrt(4));
+        System.out.println(solution.mySqrt(8));
+
 
     }
 
     class Solution {
         public String addBinary(String a, String b) {
             StringBuilder result = new StringBuilder();
-    
+
             int toNext = 0;
             int aIndex = a.length() - 1;
             int bIndex = b.length() - 1;
-    
+
             boolean hasNextInA = true;
             boolean hasNextInB = true;
             boolean hasMoreElements = true;
-    
+
             while (hasMoreElements) {
                 int sum = 0;
-    
+
                 if (aIndex >= 0 && bIndex >= 0) {
                     sum = Character.getNumericValue(a.charAt(aIndex)) + Character.getNumericValue(b.charAt(bIndex));
                     aIndex--;
@@ -42,10 +47,10 @@ public interface App {
                 } else {
                     break;
                 }
-    
+
                 sum += toNext;
                 toNext = 0;
-    
+
                 if (sum > 2) {
                     sum = 1;
                     toNext = 1;
@@ -53,17 +58,52 @@ public interface App {
                     sum = 0;
                     toNext = 1;
                 }
-    
+
                 result.insert(0, sum);
-    
+
                 hasMoreElements = hasNextInA || hasNextInB;
             }
-    
+
             if (toNext == 1) {
                 result.insert(0, toNext);
             }
-    
+
             return result.toString();
+        }
+
+        //9 => [1,2,3,4,5,6,7,8,9]
+        //
+        public int mySqrt(int x) {
+
+            int result = 0;
+
+            int left = 1;
+            int right = x / 2;
+
+
+            while (left <= right) {
+
+                int mid = left + (right - left) / 2;
+
+                //System.out.println("mid => " + mid);
+
+                long square = (long) mid * mid;
+
+                //System.out.println("square => " + square);
+
+                if(square == x){
+                  return mid;
+                }else if (square < x) {
+                    result = mid;  
+                    left = mid + 1;
+                }else{
+                    right = mid - 1;
+                }
+
+            }
+
+            return result;
+
         }
     }
 }

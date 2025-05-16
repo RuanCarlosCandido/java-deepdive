@@ -6,7 +6,7 @@ import java.time.YearMonth;
 public record Transaction(
         String user,
         TransactionType transactionType,
-        BigDecimal bigDecimal,
+        BigDecimal value,
         String currency,
-        YearMonth of) {
+        YearMonth yearMonth) {
 }
