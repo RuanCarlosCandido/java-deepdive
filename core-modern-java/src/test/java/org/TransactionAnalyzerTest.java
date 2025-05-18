@@ -90,15 +90,15 @@ class TransactionAnalyzerTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test
-    void shouldHandleUnknownCurrencyGracefully() {
-        List<Transaction> faulty = List
-                .of(new Transaction("userX", TransactionType.PIX, new BigDecimal("100"), "JPY", YearMonth.now()));
+        @Test
+        void shouldHandleUnknownCurrencyGracefully() {
+                List<Transaction> faulty = List
+                        .of(new Transaction("userX", TransactionType.PIX, new BigDecimal("100"), "JPY", YearMonth.now()));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> TransactionAnalyzer.analyze(faulty.stream(), currencyConverter));
-        assertNotNull(exception.getMessage());
-    }
+                IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                        () -> TransactionAnalyzer.analyze(faulty.stream(), currencyConverter));
+                assertNotNull(exception.getMessage());
+        }
 
     @Test
     void shouldWorkWithLargeDatasetInParallel() {

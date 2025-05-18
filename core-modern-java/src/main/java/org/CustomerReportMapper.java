@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 public class CustomerReportMapper {
 
         public static CustomerReport from(Transaction tx, CurrencyConverter cc) {
+
+                
                 BigDecimal amountInBRL = tx.value().multiply(cc.currencyMap().get(tx.currency()));
 
                 return new CustomerReport(

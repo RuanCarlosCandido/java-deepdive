@@ -9,6 +9,11 @@ public class TransactionAnalyzer {
             CurrencyConverter currencyConverter) {
 
         return transactionsStream
+                .peek(tx -> {
+                    if (!currencyConverter.currencyMap().containsKey(tx.currency())) {
+                        throw new IllegalArgumentException("Unsupported currency: " + tx.currency());
+                    }
+                })
                 .filter(tx -> currencyConverter.currencyMap().containsKey(tx.currency()))
                 .collect(
                         java.util.stream.Collectors.toConcurrentMap(
