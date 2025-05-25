@@ -1,4 +1,4 @@
-package org;
+package org.streams.exercises;
 
 import java.util.Map;
 import java.util.stream.Stream;

@@ -1,4 +1,4 @@
-package org.streams;
+package org.streams.samples;
 
 import java.util.Comparator;
 import java.util.LinkedList;
