@@ -8,12 +8,13 @@ public interface App {
         String a = "1010";
         String b = "1011";
 
-        //System.out.println(solution.addBinary(a, b));
+        // System.out.println(solution.addBinary(a, b));
 
-        System.out.println(solution.mySqrt(9));
-        System.out.println(solution.mySqrt(4));
-        System.out.println(solution.mySqrt(8));
+        // System.out.println(solution.mySqrt(9));
+        // System.out.println(solution.mySqrt(4));
+        // System.out.println(solution.mySqrt(8));
 
+        System.out.println(solution.climbStairs(10));
 
     }
 
@@ -71,7 +72,7 @@ public interface App {
             return result.toString();
         }
 
-        //9 => [1,2,3,4,5,6,7,8,9]
+        // 9 => [1,2,3,4,5,6,7,8,9]
         //
         public int mySqrt(int x) {
 
@@ -80,23 +81,22 @@ public interface App {
             int left = 1;
             int right = x / 2;
 
-
             while (left <= right) {
 
                 int mid = left + (right - left) / 2;
 
-                //System.out.println("mid => " + mid);
+                // System.out.println("mid => " + mid);
 
                 long square = (long) mid * mid;
 
-                //System.out.println("square => " + square);
+                // System.out.println("square => " + square);
 
-                if(square == x){
-                  return mid;
-                }else if (square < x) {
-                    result = mid;  
+                if (square == x) {
+                    return mid;
+                } else if (square < x) {
+                    result = mid;
                     left = mid + 1;
-                }else{
+                } else {
                     right = mid - 1;
                 }
 
@@ -104,6 +104,26 @@ public interface App {
 
             return result;
 
+        }
+
+        public int climbStairs(int n) {
+            if (n == 1) {
+                return 1;
+            }
+            if (n == 2) {
+                return 2;
+            }
+
+            int first = 1; // Formas de chegar no degrau 1
+            int second = 2; // Formas de chegar no degrau 2
+
+            for (int degrau = 3; degrau <= n; degrau++) {
+                int next = first + second;
+                first = second;
+                second = next;
+            }
+
+            return second;
         }
     }
 }
